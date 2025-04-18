@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>پنل DNS گیمینگ | ورود امن</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Vazirmatn', sans-serif;
+      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      margin: 0;
+      padding: 0;
+      color: white;
+    }
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+    .login-box, .panel {
+      background: rgba(0, 0, 0, 0.6);
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 0 20px #0ff;
+      margin-top: 2rem;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #0ff;
+    }
+    input, select, button {
+      width: 100%;
+      padding: 0.8rem;
+      margin-top: 1rem;
+      border-radius: 10px;
+      border: none;
+    }
+    input {
+      background: #222;
+      color: white;
+    }
+    button {
+      background: #0ff;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #00cccc;
+    }
+    .hidden {
+      display: none;
+    }
+    .dns-box {
+      background: #111;
+      padding: 1rem;
+      margin-top: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 8px #00cccc;
+    }
+    .profile-box {
+      background: #111;
+      padding: 1rem;
+      border-radius: 10px;
+      box-shadow: 0 0 8px #00cccc;
+      margin-top: 1rem;
+    }
+    .error-message {
+      color: red;
+      text-align: center;
+      display: none;
+    }
+    .game-info-box {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 1rem;
+      border-radius: 10px;
+      margin-top: 2rem;
+      box-shadow: 0 0 8px #0ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- فرم ورود -->
+    <div class="login-box">
+      <h1>ورود به پنل گیمینگ</h1>
+      <input type="text" id="username" placeholder="نام کاربری">
+      <input type="password" id="password" placeholder="رمز عبور">
+      <button onclick="validateLogin()">ورود</button>
+      <p id="error" class="error-message">نام کاربری یا رمز اشتباه است</p>
+      <h2>ثبت‌نام کاربر جدید</h2>
+      <input type="text" id="newUsername" placeholder="نام کاربری جدید">
+      <input type="password" id="newPassword" placeholder="رمز عبور جدید">
+      <button onclick="registerUser()">ثبت‌نام</button>
+    </div>
+
+    <!-- پنل اصلی (مخفی تا ورود صحیح) -->
+    <div class="panel hidden" id="mainPanel">
+      <h2>DNS گیمینگ پیشرفته</h2>
+
+      <!-- DNS نسل ۴ -->
+      <div class="dns-box">
+        <h3>DNS نسل چهار (IPv4):</h3>
+        <p>45.90.28.1</p>
+        <p>45.90.30.1</p>
+        <button onclick="copyDNS('45.90.28.1')">کپی</button>
+        <button onclick="copyDNS('45.90.30.1')">کپی</button>
+      </div>
+
+      <!-- DNS نسل ۶ -->
+      <div class="dns-box">
+        <h3>DNS نسل شش (IPv6):</h3>
+        <p>2a10:50c0::1</p>
+        <p>2a10:50c0::2</p>
+        <button onclick="copyDNS('2a10:50c0::1')">کپی</button>
+        <button onclick="copyDNS('2a10:50c0::2')">کپی</button>
+      </div>
+
+      <!-- انتخاب بازی -->
+      <h3>انتخاب بازی:</h3>
+      <select id="gameSelect">
+        <option value="">انتخاب بازی...</option>
+        <option>PUBG</option>
+        <option>Valorant</option>
+        <option>Free Fire</option>
+        <option>Call of Duty</option>
+      </select>
+      <button onclick="sendBestDNS()">دریافت بهترین DNS</button>
+
+      <!-- اطلاعات بازی -->
+      <div id="gameInfoBox" class="game-info-box hidden">
+        <h3>اطلاعات بهترین DNS برای بازی:</h3>
+        <p id="gameDNSInfo"></p>
+      </div>
+
+      <!-- نمایش پروفایل کاربری -->
+      <div class="profile-box">
+        <h3>پروفایل کاربری:</h3>
+        <p>نام کاربری: <span id="profileUsername"></span></p>
+        <p>آی‌پی شما: <span id="userIP">در حال بارگذاری...</span></p>
+        <button onclick="logout()">خروج</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentUser = null;
+
+    function validateLogin() {
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+
+      if (username === "gamer123" && password === "dnsmaster") {
+        currentUser = { username };
+        document.getElementById("profileUsername").innerText = username;
+        document.querySelector('.login-box').style.display = 'none';
+        document.getElementById("mainPanel").classList.remove("hidden");
+        getUserIP();
+      } else {
+        document.getElementById("error").style.display = "block";
+      }
+    }
+
+    function registerUser() {
+      const newUsername = document.getElementById("newUsername").value.trim();
+      const newPassword = document.getElementById("newPassword").value.trim();
+
+      if (newUsername && newPassword) {
+        // برای امنیت بیشتر، اینجا باید به سرور متصل بشه تا اطلاعات در دیتابیس ذخیره بشه
+        alert(`کاربر ${newUsername} با موفقیت ثبت‌نام شد!`);
+      } else {
+        alert('لطفاً تمامی فیلدها را پر کنید.');
+      }
+    }
+
+    function sendBestDNS() {
+      const game = document.getElementById("gameSelect").value;
+      if (!game) return alert("لطفاً یک بازی انتخاب کنید.");
+
+      const dnsList = {
+        PUBG: {
+          ipv4: ["45.90.28.1", "45.90.30.1"],
+          ipv6: ["2a10:50c0::1", "2a10:50c0::2"]
+        },
+        Valorant: {
+          ipv4: ["45.90.28.2", "45.90.30.2"],
+          ipv6: ["2a10:50c0::3", "2a10:50c0::4"]
+        },
+        "Free Fire": {
+          ipv4: ["45.90.28.3", "45.90.30.3"],
+          ipv6: ["2a10:50c0::5", "2a10:50c0::6"]
+        },
+        "Call of Duty": {
+          ipv4: ["45.90.28.4", "45.90.30.4"],
+          ipv6: ["2a10:50c0::7", "2a10:50c0::8"]
+        }
+      };
+
+      const selectedDNS = dnsList[game];
+
+      if (selectedDNS) {
+        const bestDNSMessage = `
+          بازی: ${game}\n
+          DNS نسل ۴ (IPv4): ${selectedDNS.ipv4.join(", ")}\n
+          DNS نسل ۶ (IPv6): ${selectedDNS.ipv6.join(", ")}
+        `;
+        sendToTelegram(bestDNSMessage);
+
+        document.getElementById("gameDNSInfo").innerText = `
+          DNS نسل ۴ (IPv4): ${selectedDNS.ipv4.join(", ")}
+          DNS نسل ۶ (IPv6): ${selectedDNS.ipv6.join(", ")}
+        `;
+        document.getElementById("gameInfoBox").classList.remove("hidden");
+      } else {
+        alert("موردی پیدا نشد.");
+      }
+    }
+
+    function sendToTelegram(message) {
+      const botToken = "8138490091:AAE0sTFAH59tS4ZM9Fp8tMC7eDjQZJOigCM";
+      const chatId = "7255721745";
+
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text: message }),
+      })
+        .then(res => res.ok ? alert("ارسال شد!") : alert("ارسال نشد!"));
+    }
+
+    function copyDNS(dns) {
+      navigator.clipboard.writeText(dns).then(() => {
+        alert(`DNS ${dns} کپی شد!`);
+      });
+    }
+
+    function getUserIP() {
+      fetch('https://api.ipify.org?format=json')
+        .then(response => response.json())
+        .then(data => {
+          document.getElementById('userIP').innerText = data.ip;
+        });
+    }
+
+    function logout() {
+      currentUser = null;
+      document.querySelector('.login-box').style.display = 'block';
+      document.getElementById("mainPanel").classList.add("hidden");
+      alert('از حساب خود خارج شدید!');
+    }
+  </script>
+</body>
+</html>
