@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>پنل ادمین</title>
+  <style>
+    body { background: #000; color: #fff; font-family: sans-serif; text-align: center; padding-top: 50px; }
+    input, button { padding: 10px; margin: 10px; border-radius: 8px; border: none; }
+    #panel { display: none; }
+  </style>
+</head>
+<body>
+  <h2>ورود ادمین</h2>
+  <input type="text" id="username" placeholder="نام کاربری"><br>
+  <input type="password" id="password" placeholder="رمز عبور"><br>
+  <button onclick="login()">ورود</button>
+
+  <div id="panel">
+    <h3>ثبت مشتری</h3>
+    <input type="text" id="clientNumber" placeholder="شماره مشتری"><br>
+    <button onclick="register()">تولید حساب</button>
+    <div id="result"></div>
+  </div>
+
+  <script>
+    const botToken = "8138490091:AAE0sTFAH59tS4ZM9Fp8tMC7eDjQZJOigCM";
+    const chatId = "7255721745";
+
+    function login() {
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+      if (user === "yasin" && pass === "Pahlavi") {
+        document.getElementById("panel").style.display = "block";
+      } else {
+        alert("اطلاعات اشتباه است.");
+      }
+    }
+
+    function register() {
+      const number = document.getElementById("clientNumber").value;
+      const username = "user" + Math.floor(Math.random() * 9000 + 1000);
+      const password = Math.random().toString(36).slice(-6);
+
+      localStorage.setItem(username, password);
+
+      document.getElementById("result").innerHTML = `نام کاربری: ${username} <br> رمز عبور: ${password}`;
+
+      const msg = `ثبت مشتری جدید:\nشماره: ${number}\nنام کاربری: ${username}\nرمز: ${password}`;
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msg)}`);
+    }
+  </script>
+</body>
+</html>
