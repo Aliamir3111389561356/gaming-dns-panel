@@ -2,135 +2,16 @@
 <html lang="fa">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>پنل DNS و وایرگارد گیمینگ</title>
+  <title>صفحه اصلی DNS گیمینگ</title>
   <style>
-    body {
-      font-family: Tahoma, sans-serif;
-      background: #0f172a;
-      color: #fff;
-      text-align: center;
-      margin: 0;
-      padding: 0;
-    }
-    h1 {
-      margin-top: 20px;
-      color: #38bdf8;
-    }
-    .section {
-      background: #1e293b;
-      margin: 20px auto;
-      padding: 20px;
-      border-radius: 16px;
-      width: 90%;
-      max-width: 600px;
-      box-shadow: 0 0 10px #0ea5e9;
-    }
-    input, select, textarea, button {
-      width: 90%;
-      margin: 10px auto;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: none;
-      outline: none;
-      display: block;
-    }
-    button {
-      background-color: #0ea5e9;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-    }
-    button:hover {
-      background-color: #0284c7;
-    }
-    .result {
-      background: #334155;
-      padding: 10px;
-      border-radius: 8px;
-      word-break: break-word;
-    }
-    .qr-img {
-      margin-top: 15px;
-      max-width: 200px;
-    }
-    a.download-link {
-      display: block;
-      margin-top: 10px;
-      color: #0ea5e9;
-      text-decoration: none;
-      font-weight: bold;
-    }
+    body { font-family: sans-serif; text-align: center; background: #111; color: white; padding-top: 100px; }
+    a { display: block; margin: 20px; font-size: 20px; text-decoration: none; background: #444; padding: 10px; border-radius: 10px; color: white; width: 200px; margin: 20px auto; }
+    a:hover { background: #555; }
   </style>
 </head>
 <body>
-  <h1>پنل DNS و وایرگارد گیمینگ</h1>
-
-  <div class="section">
-    <h2>تولید بهترین DNS گیمینگ</h2>
-    <button onclick="generateDNS()">تولید DNS</button>
-    <div class="result" id="dnsResult"></div>
-  </div>
-
-  <div class="section">
-    <h2>درخواست کانفیگ وایرگارد گیمینگ</h2>
-    <input type="text" id="username" placeholder="نام کاربری شما">
-    <input type="text" id="game" placeholder="نام بازی موردنظر">
-    <textarea id="desc" rows="3" placeholder="توضیحات دلخواه (اختیاری)"></textarea>
-    <button onclick="sendToTelegram()">ارسال درخواست کانفیگ</button>
-    <div class="result" id="qrSection"></div>
-    <a id="downloadLink" class="download-link" style="display:none;" download="wireguard.conf">دانلود فایل کانفیگ</a>
-  </div>
-
-  <script>
-    function generateDNS() {
-      const ipv6Prefixes = ["2a06:9f81::", "2a0f:9400::", "2a0e:2b80::", "2a0d:5600::", "2a10:50c0::"];
-      const ipv4Prefixes = ["45.90.28.", "45.90.30.", "45.11.45.", "45.66.33.", "45.155.204."];
-
-      const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)] + Math.floor(Math.random() * 255);
-
-      const dns1 = getRandom(ipv4Prefixes);
-      const dns2 = getRandom(ipv6Prefixes);
-
-      document.getElementById('dnsResult').innerHTML = `DNS نسل چهار: ${dns1}<br>DNS نسل شش: ${dns2}`;
-    }
-
-    function sendToTelegram() {
-      const token = "8138490091:AAE0sTFAH59tS4ZM9Fp8tMC7eDjQZJOigCM";
-      const chatId = "7255721745";
-      const username = document.getElementById('username').value;
-      const game = document.getElementById('game').value;
-      const desc = document.getElementById('desc').value;
-
-      const message = `درخواست کانفیگ وایرگارد گیمینگ:\\nنام کاربری: ${username}\\nبازی: ${game}\\nتوضیحات: ${desc}`;
-
-      const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
-      fetch(url)
-        .then(res => {
-          alert("درخواست شما ارسال شد.");
-          generateWireguardConfig(username);
-        })
-        .catch(err => alert("خطا در ارسال درخواست."));
-    }
-
-    function generateWireguardConfig(username) {
-      const configText = `[Interface]\\nPrivateKey = <YourPrivateKey>\\nAddress = 10.0.0.2/32\\nDNS = 1.1.1.1\\n\\n[Peer]\\nPublicKey = <ServerPublicKey>\\nEndpoint = your.vpn.server:51820\\nAllowedIPs = 0.0.0.0/0, ::/0\\nPersistentKeepalive = 25`;
-
-      const blob = new Blob([configText], { type: 'text/plain' });
-      const url = URL.createObjectURL(blob);
-      const link = document.getElementById("downloadLink");
-      link.href = url;
-      link.style.display = "block";
-
-      generateQR(configText);
-    }
-
-    function generateQR(data) {
-      const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data)}`;
-      const qrSection = document.getElementById('qrSection');
-      qrSection.innerHTML = `<img class='qr-img' src='${qrApi}' alt='QR Code'>`;
-    }
-  </script>
+  <h1>پنل DNS گیمینگ</h1>
+  <a href="admin.html">ورود ادمین</a>
+  <a href="client.html">ورود مشتری</a>
 </body>
 </html>
