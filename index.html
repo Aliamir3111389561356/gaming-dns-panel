@@ -1,253 +1,135 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="fa">
 <head>
   <meta charset="UTF-8">
-  <title>پنل DNS گیمینگ | ورود امن</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn&display=swap" rel="stylesheet">
+  <title>پنل DNS و وایرگارد گیمینگ</title>
   <style>
     body {
-      font-family: 'Vazirmatn', sans-serif;
-      background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+      font-family: Tahoma, sans-serif;
+      background: #0f172a;
+      color: #fff;
+      text-align: center;
       margin: 0;
       padding: 0;
-      color: white;
     }
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 2rem;
+    h1 {
+      margin-top: 20px;
+      color: #38bdf8;
     }
-    .login-box, .panel {
-      background: rgba(0, 0, 0, 0.6);
-      padding: 2rem;
-      border-radius: 15px;
-      box-shadow: 0 0 20px #0ff;
-      margin-top: 2rem;
+    .section {
+      background: #1e293b;
+      margin: 20px auto;
+      padding: 20px;
+      border-radius: 16px;
+      width: 90%;
+      max-width: 600px;
+      box-shadow: 0 0 10px #0ea5e9;
     }
-    h1, h2 {
-      text-align: center;
-      color: #0ff;
-    }
-    input, select, button {
-      width: 100%;
-      padding: 0.8rem;
-      margin-top: 1rem;
-      border-radius: 10px;
+    input, select, textarea, button {
+      width: 90%;
+      margin: 10px auto;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 8px;
       border: none;
-    }
-    input {
-      background: #222;
-      color: white;
+      outline: none;
+      display: block;
     }
     button {
-      background: #0ff;
-      color: black;
+      background-color: #0ea5e9;
+      color: white;
       font-weight: bold;
       cursor: pointer;
     }
     button:hover {
-      background: #00cccc;
+      background-color: #0284c7;
     }
-    .hidden {
-      display: none;
+    .result {
+      background: #334155;
+      padding: 10px;
+      border-radius: 8px;
+      word-break: break-word;
     }
-    .dns-box {
-      background: #111;
-      padding: 1rem;
-      margin-top: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 0 8px #00cccc;
+    .qr-img {
+      margin-top: 15px;
+      max-width: 200px;
     }
-    .profile-box {
-      background: #111;
-      padding: 1rem;
-      border-radius: 10px;
-      box-shadow: 0 0 8px #00cccc;
-      margin-top: 1rem;
-    }
-    .error-message {
-      color: red;
-      text-align: center;
-      display: none;
-    }
-    .game-info-box {
-      background: rgba(0, 0, 0, 0.8);
-      padding: 1rem;
-      border-radius: 10px;
-      margin-top: 2rem;
-      box-shadow: 0 0 8px #0ff;
+    a.download-link {
+      display: block;
+      margin-top: 10px;
+      color: #0ea5e9;
+      text-decoration: none;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- فرم ورود -->
-    <div class="login-box">
-      <h1>ورود به پنل گیمینگ</h1>
-      <input type="text" id="username" placeholder="نام کاربری">
-      <input type="password" id="password" placeholder="رمز عبور">
-      <button onclick="validateLogin()">ورود</button>
-      <p id="error" class="error-message">نام کاربری یا رمز اشتباه است</p>
-      <h2>ثبت‌نام کاربر جدید</h2>
-      <input type="text" id="newUsername" placeholder="نام کاربری جدید">
-      <input type="password" id="newPassword" placeholder="رمز عبور جدید">
-      <button onclick="registerUser()">ثبت‌نام</button>
-    </div>
+  <h1>پنل DNS و وایرگارد گیمینگ</h1>
 
-    <!-- پنل اصلی (مخفی تا ورود صحیح) -->
-    <div class="panel hidden" id="mainPanel">
-      <h2>DNS گیمینگ پیشرفته</h2>
+  <div class="section">
+    <h2>تولید بهترین DNS گیمینگ</h2>
+    <button onclick="generateDNS()">تولید DNS</button>
+    <div class="result" id="dnsResult"></div>
+  </div>
 
-      <!-- DNS نسل ۴ -->
-      <div class="dns-box">
-        <h3>DNS نسل چهار (IPv4):</h3>
-        <p>45.90.28.1</p>
-        <p>45.90.30.1</p>
-        <button onclick="copyDNS('45.90.28.1')">کپی</button>
-        <button onclick="copyDNS('45.90.30.1')">کپی</button>
-      </div>
-
-      <!-- DNS نسل ۶ -->
-      <div class="dns-box">
-        <h3>DNS نسل شش (IPv6):</h3>
-        <p>2a10:50c0::1</p>
-        <p>2a10:50c0::2</p>
-        <button onclick="copyDNS('2a10:50c0::1')">کپی</button>
-        <button onclick="copyDNS('2a10:50c0::2')">کپی</button>
-      </div>
-
-      <!-- انتخاب بازی -->
-      <h3>انتخاب بازی:</h3>
-      <select id="gameSelect">
-        <option value="">انتخاب بازی...</option>
-        <option>PUBG</option>
-        <option>Valorant</option>
-        <option>Free Fire</option>
-        <option>Call of Duty</option>
-      </select>
-      <button onclick="sendBestDNS()">دریافت بهترین DNS</button>
-
-      <!-- اطلاعات بازی -->
-      <div id="gameInfoBox" class="game-info-box hidden">
-        <h3>اطلاعات بهترین DNS برای بازی:</h3>
-        <p id="gameDNSInfo"></p>
-      </div>
-
-      <!-- نمایش پروفایل کاربری -->
-      <div class="profile-box">
-        <h3>پروفایل کاربری:</h3>
-        <p>نام کاربری: <span id="profileUsername"></span></p>
-        <p>آی‌پی شما: <span id="userIP">در حال بارگذاری...</span></p>
-        <button onclick="logout()">خروج</button>
-      </div>
-    </div>
+  <div class="section">
+    <h2>درخواست کانفیگ وایرگارد گیمینگ</h2>
+    <input type="text" id="username" placeholder="نام کاربری شما">
+    <input type="text" id="game" placeholder="نام بازی موردنظر">
+    <textarea id="desc" rows="3" placeholder="توضیحات دلخواه (اختیاری)"></textarea>
+    <button onclick="sendToTelegram()">ارسال درخواست کانفیگ</button>
+    <div class="result" id="qrSection"></div>
+    <a id="downloadLink" class="download-link" style="display:none;" download="wireguard.conf">دانلود فایل کانفیگ</a>
   </div>
 
   <script>
-    let currentUser = null;
+    function generateDNS() {
+      const ipv6Prefixes = ["2a06:9f81::", "2a0f:9400::", "2a0e:2b80::", "2a0d:5600::", "2a10:50c0::"];
+      const ipv4Prefixes = ["45.90.28.", "45.90.30.", "45.11.45.", "45.66.33.", "45.155.204."];
 
-    function validateLogin() {
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
+      const getRandom = (arr) => arr[Math.floor(Math.random() * arr.length)] + Math.floor(Math.random() * 255);
 
-      if (username === "gamer123" && password === "dnsmaster") {
-        currentUser = { username };
-        document.getElementById("profileUsername").innerText = username;
-        document.querySelector('.login-box').style.display = 'none';
-        document.getElementById("mainPanel").classList.remove("hidden");
-        getUserIP();
-      } else {
-        document.getElementById("error").style.display = "block";
-      }
+      const dns1 = getRandom(ipv4Prefixes);
+      const dns2 = getRandom(ipv6Prefixes);
+
+      document.getElementById('dnsResult').innerHTML = `DNS نسل چهار: ${dns1}<br>DNS نسل شش: ${dns2}`;
     }
 
-    function registerUser() {
-      const newUsername = document.getElementById("newUsername").value.trim();
-      const newPassword = document.getElementById("newPassword").value.trim();
-
-      if (newUsername && newPassword) {
-        // برای امنیت بیشتر، اینجا باید به سرور متصل بشه تا اطلاعات در دیتابیس ذخیره بشه
-        alert(`کاربر ${newUsername} با موفقیت ثبت‌نام شد!`);
-      } else {
-        alert('لطفاً تمامی فیلدها را پر کنید.');
-      }
-    }
-
-    function sendBestDNS() {
-      const game = document.getElementById("gameSelect").value;
-      if (!game) return alert("لطفاً یک بازی انتخاب کنید.");
-
-      const dnsList = {
-        PUBG: {
-          ipv4: ["45.90.28.1", "45.90.30.1"],
-          ipv6: ["2a10:50c0::1", "2a10:50c0::2"]
-        },
-        Valorant: {
-          ipv4: ["45.90.28.2", "45.90.30.2"],
-          ipv6: ["2a10:50c0::3", "2a10:50c0::4"]
-        },
-        "Free Fire": {
-          ipv4: ["45.90.28.3", "45.90.30.3"],
-          ipv6: ["2a10:50c0::5", "2a10:50c0::6"]
-        },
-        "Call of Duty": {
-          ipv4: ["45.90.28.4", "45.90.30.4"],
-          ipv6: ["2a10:50c0::7", "2a10:50c0::8"]
-        }
-      };
-
-      const selectedDNS = dnsList[game];
-
-      if (selectedDNS) {
-        const bestDNSMessage = `
-          بازی: ${game}\n
-          DNS نسل ۴ (IPv4): ${selectedDNS.ipv4.join(", ")}\n
-          DNS نسل ۶ (IPv6): ${selectedDNS.ipv6.join(", ")}
-        `;
-        sendToTelegram(bestDNSMessage);
-
-        document.getElementById("gameDNSInfo").innerText = `
-          DNS نسل ۴ (IPv4): ${selectedDNS.ipv4.join(", ")}
-          DNS نسل ۶ (IPv6): ${selectedDNS.ipv6.join(", ")}
-        `;
-        document.getElementById("gameInfoBox").classList.remove("hidden");
-      } else {
-        alert("موردی پیدا نشد.");
-      }
-    }
-
-    function sendToTelegram(message) {
-      const botToken = "8138490091:AAE0sTFAH59tS4ZM9Fp8tMC7eDjQZJOigCM";
+    function sendToTelegram() {
+      const token = "8138490091:AAE0sTFAH59tS4ZM9Fp8tMC7eDjQZJOigCM";
       const chatId = "7255721745";
+      const username = document.getElementById('username').value;
+      const game = document.getElementById('game').value;
+      const desc = document.getElementById('desc').value;
 
-      fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ chat_id: chatId, text: message }),
-      })
-        .then(res => res.ok ? alert("ارسال شد!") : alert("ارسال نشد!"));
+      const message = `درخواست کانفیگ وایرگارد گیمینگ:\\nنام کاربری: ${username}\\nبازی: ${game}\\nتوضیحات: ${desc}`;
+
+      const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+      fetch(url)
+        .then(res => {
+          alert("درخواست شما ارسال شد.");
+          generateWireguardConfig(username);
+        })
+        .catch(err => alert("خطا در ارسال درخواست."));
     }
 
-    function copyDNS(dns) {
-      navigator.clipboard.writeText(dns).then(() => {
-        alert(`DNS ${dns} کپی شد!`);
-      });
+    function generateWireguardConfig(username) {
+      const configText = `[Interface]\\nPrivateKey = <YourPrivateKey>\\nAddress = 10.0.0.2/32\\nDNS = 1.1.1.1\\n\\n[Peer]\\nPublicKey = <ServerPublicKey>\\nEndpoint = your.vpn.server:51820\\nAllowedIPs = 0.0.0.0/0, ::/0\\nPersistentKeepalive = 25`;
+
+      const blob = new Blob([configText], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const link = document.getElementById("downloadLink");
+      link.href = url;
+      link.style.display = "block";
+
+      generateQR(configText);
     }
 
-    function getUserIP() {
-      fetch('https://api.ipify.org?format=json')
-        .then(response => response.json())
-        .then(data => {
-          document.getElementById('userIP').innerText = data.ip;
-        });
-    }
-
-    function logout() {
-      currentUser = null;
-      document.querySelector('.login-box').style.display = 'block';
-      document.getElementById("mainPanel").classList.add("hidden");
-      alert('از حساب خود خارج شدید!');
+    function generateQR(data) {
+      const qrApi = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(data)}`;
+      const qrSection = document.getElementById('qrSection');
+      qrSection.innerHTML = `<img class='qr-img' src='${qrApi}' alt='QR Code'>`;
     }
   </script>
 </body>
