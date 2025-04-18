@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+  <meta charset="UTF-8">
+  <title>ورود مشتری</title>
+  <style>
+    body { background: #111; color: white; font-family: sans-serif; text-align: center; padding-top: 60px; }
+    input, button { padding: 10px; margin: 10px; border-radius: 8px; border: none; }
+    #dnsPanel { display: none; }
+  </style>
+</head>
+<body>
+  <h2>ورود مشتری</h2>
+  <input type="text" id="user"><br>
+  <input type="password" id="pass"><br>
+  <button onclick="enter()">ورود</button>
+
+  <div id="dnsPanel">
+    <h3>تولید بهترین DNS گیمینگ</h3>
+    <button onclick="generateDNS()">تولید DNS</button>
+    <div id="output"></div>
+  </div>
+
+  <script>
+    const botToken = "8138490091:AAE0sTFAH59tS4ZM9Fp8tMC7eDjQZJOigCM";
+    const chatId = "7255721745";
+
+    let currentUser = "";
+
+    function enter() {
+      const u = document.getElementById("user").value;
+      const p = document.getElementById("pass").value;
+      if (localStorage.getItem(u) === p) {
+        document.getElementById("dnsPanel").style.display = "block";
+        currentUser = u;
+      } else {
+        alert("اطلاعات اشتباه است.");
+      }
+    }
+
+    function generateDNS() {
+      const ipv4 = `45.${rand(0,255)}.${rand(0,255)}.${rand(1,254)}`;
+      const ipv6 = `2606:4700:${rand(1000,9999)}::${rand(1000,9999)}`;
+
+      const msg = `DNS تولید شده:\nکاربر: ${currentUser}\nIPv4: ${ipv4}\nIPv6: ${ipv6}`;
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msg)}`);
+
+      document.getElementById("output").innerHTML = `DNS شما:<br>IPv4: ${ipv4}<br>IPv6: ${ipv6}`;
+    }
+
+    function rand(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+  </script>
+</body>
+</html>
