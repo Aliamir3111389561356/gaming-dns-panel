@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پنل اختصاصی PAHLAVI</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #8E2DE2 0%, #4A00E0 100%);
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .login-container, .panel-container {
+            background-color: rgba(0, 0, 0, 0.8);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+            display: none;
+        }
+        .panel-container {
+            display: none;
+        }
+        h1 {
+            color: #FFD700;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+        }
+        input {
+            width: 80%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 25px;
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 16px;
+            outline: none;
+        }
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        button {
+            background: linear-gradient(90deg, #FF416C 0%, #FF4B2B 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            margin: 15px 0;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s;
+            width: 85%;
+        }
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(255, 75, 43, 0.4);
+        }
+        .dns-result {
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            text-align: center;
+            position: relative;
+        }
+        .dns-server {
+            color: #00FF00;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            font-size: 18px;
+            direction: ltr;
+            background-color: rgba(0, 0, 0, 0.3);
+            padding: 8px;
+            border-radius: 5px;
+            display: inline-block;
+            min-width: 200px;
+        }
+        .ping-value {
+            color: #00FFFF;
+            font-weight: bold;
+        }
+        .game-ping {
+            color: #FFA500;
+            margin-top: 20px;
+        }
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .controls button {
+            width: 48%;
+            padding: 10px;
+        }
+        .logout-btn {
+            background: linear-gradient(90deg, #4776E6 0%, #8E54E9 100%);
+            margin-top: 30px;
+        }
+        .error {
+            color: #FF4444;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container" id="login-container">
+        <h1>ورود به پنل اختصاصی</h1>
+        <input type="text" id="username" placeholder="نام کاربری">
+        <input type="password" id="password" placeholder="رمز عبور">
+        <button onclick="login()">ورود</button>
+        <div class="error" id="login-error">نام کاربری یا رمز عبور اشتباه است!</div>
+    </div>
+
+    <div class="panel-container" id="panel-container">
+        <h1>پنل اختصاصی PAHLAVI</h1>
+        
+        <div class="controls">
+            <button onclick="generateLowPingDNS()">ساخت DNS پینگ پایین</button>
+            <button onclick="generateGamingDNS()">ساخت DNS گیمینگ</button>
+        </div>
+        
+        <div class="dns-result" id="dns-result">
+            <div id="dns-servers"></div>
+            <div class="game-ping" id="game-ping"></div>
+        </div>
+        
+        <div class="controls">
+            <button onclick="copyDNS()">کپی DNS ها</button>
+            <button onclick="clearDNS()">پاک کردن</button>
+        </div>
+        
+        <button class="logout-btn" onclick="logout()">خروج از پنل</button>
+    </div>
+
+    <script>
+        // اطلاعات ورود
+        const validUsername = "Pahlavi";
+        const validPassword = "Pahlavi_x6";
+        
+        // DNS های اختصاصی با پینگ پایین
+        const lowPingDNS = [
+            "185.55.226.10", "185.55.227.11", "194.5.193.12", "194.5.194.13",
+            "78.157.42.14", "78.157.43.15", "46.224.1.16", "46.224.2.17",
+            "5.200.10.18", "5.200.11.19", "37.156.20.20", "37.156.21.21"
+        ];
+        
+        // DNS های گیمینگ با پینگ بسیار پایین
+        const gamingDNS = [
+            "185.55.226.50", "185.55.227.51", "194.5.193.52", "194.5.194.53",
+            "78.157.42.54", "78.157.43.55", "46.224.1.56", "46.224.2.57",
+            "5.200.10.58", "5.200.11.59", "37.156.20.60", "37.156.21.61"
+        ];
+        
+        // بازی‌ها و پینگ‌های بهبود یافته
+        const games = [
+            {name: "PUBG", normalPing: 80, improvedPing: 25},
+            {name: "Fortnite", normalPing: 90, improvedPing: 30},
+            {name: "Call of Duty", normalPing: 85, improvedPing: 28},
+            {name: "Valorant", normalPing: 75, improvedPing: 22}
+        ];
+        
+        function login() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === validUsername && password === validPassword) {
+                document.getElementById('login-container').style.display = 'none';
+                document.getElementById('panel-container').style.display = 'block';
+                document.getElementById('login-error').style.display = 'none';
+            } else {
+                document.getElementById('login-error').style.display = 'block';
+            }
+        }
+        
+        function logout() {
+            document.getElementById('panel-container').style.display = 'none';
+            document.getElementById('login-container').style.display = 'block';
+            document.getElementById('username').value = '';
+            document.getElementById('password').value = '';
+            clearDNS();
+        }
+        
+        function generateLowPingDNS() {
+            const dnsServersElement = document.getElementById('dns-servers');
+            dnsServersElement.innerHTML = '';
+            
+            // انتخاب 4 DNS تصادفی از لیست
+            const shuffled = [...lowPingDNS].sort(() => 0.5 - Math.random());
+            const selectedDNS = shuffled.slice(0, 4);
+            
+            selectedDNS.forEach(dns => {
+                const ping = Math.floor(Math.random() * 10) + 5; // پینگ بین 5-15
+                const dnsElement = document.createElement('div');
+                dnsElement.className = 'dns-server';
+                dnsElement.innerHTML = `${dns} <span class="ping-value">(Ping: ${ping}ms)</span>`;
+                dnsServersElement.appendChild(dnsElement);
+            });
+            
+            document.getElementById('game-ping').innerHTML = '';
+        }
+        
+        function generateGamingDNS() {
+            const dnsServersElement = document.getElementById('dns-servers');
+            const gamePingElement = document.getElementById('game-ping');
+            dnsServersElement.innerHTML = '';
+            
+            // انتخاب 4 DNS تصادفی از لیست گیمینگ
+            const shuffled = [...gamingDNS].sort(() => 0.5 - Math.random());
+            const selectedDNS = shuffled.slice(0, 4);
+            
+            selectedDNS.forEach(dns => {
+                const ping = Math.floor(Math.random() * 5) + 3; // پینگ بین 3-8
+                const dnsElement = document.createElement('div');
+                dnsElement.className = 'dns-server';
+                dnsElement.innerHTML = `${dns} <span class="ping-value">(Ping: ${ping}ms)</span>`;
+                dnsServersElement.appendChild(dnsElement);
+            });
+            
+            // نمایش بهبود پینگ بازی‌ها
+            let gamePingHTML = '<h3>بهبود پینگ بازی‌ها:</h3>';
+            games.forEach(game => {
+                gamePingHTML += `
+                    <div>
+                        <strong>${game.name}:</strong> 
+                        <span style="text-decoration: line-through; color: #FF4444">${game.normalPing}ms</span> 
+                        → 
+                        <span style="color: #00FF00">${game.improvedPing}ms</span>
+                    </div>
+                `;
+            });
+            
+            gamePingElement.innerHTML = gamePingHTML;
+        }
+        
+        function copyDNS() {
+            const dnsElements = document.querySelectorAll('.dns-server');
+            if (dnsElements.length === 0) return;
+            
+            let dnsText = '';
+            dnsElements.forEach(el => {
+                dnsText += el.textContent.split(' (Ping:')[0] + '\n';
+            });
+            
+            navigator.clipboard.writeText(dnsText.trim())
+                .then(() => alert('DNS ها با موفقیت کپی شدند!'))
+                .catch(() => alert('خطا در کپی کردن DNS ها!'));
+        }
+        
+        function clearDNS() {
+            document.getElementById('dns-servers').innerHTML = '';
+            document.getElementById('game-ping').innerHTML = '';
+        }
+    </script>
+</body>
+</html>
